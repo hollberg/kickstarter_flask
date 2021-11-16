@@ -5,11 +5,11 @@ database schemas for Kickstarter app
 # *** IMPORTS ***
 from os import getenv
 from flask_sqlalchemy import SQLAlchemy
-import pandas as pd
-try:
-    from .ref import DATABASE_URL
-except ImportError:
-    raise ImportError('Did not find ref.py')
+# import pandas as pd
+# try:
+#     from .ref import DATABASE_URL
+# except ImportError:
+#     raise ImportError('Did not find ref.py')
 
 
 
@@ -18,18 +18,18 @@ except ImportError:
 DB = SQLAlchemy()
 
 # Create SQLAlchemy engine object
-# Logic handles both local and Heroku environments
-try:
-    postgres_url = getenv('DATABASE_URL')
-    # Postgres URL uses the 'postgres' prefix rather than SQLAlchemy's
-    # preferred 'posgresql'. Fix this
-    postgres_url = postgres_url.replace('postgres', 'postgresql')
-except:
-    postgres_url = DATABASE_URL
+postgres_url = getenv('DATABASE_URL')
+postgres_url = postgres_url.replace('postgres', 'postgresql')
+# # Logic handles both local and Heroku environments
+# try:
+#     postgres_url = getenv('DATABASE_URL')
+#     # Postgres URL uses the 'postgres' prefix rather than SQLAlchemy's
+#     # preferred 'posgresql'. Fix this
+#     postgres_url = postgres_url.replace('postgres', 'postgresql')
+# except:
+#     postgres_url = DATABASE_URL
 
 
-
-#postgres_url = r'postgresql://b'
 engine = DB.create_engine(sa_url=postgres_url,
                           engine_opts={})
 
@@ -38,29 +38,31 @@ moo = 'boo'
 
 # *** DATA IMPORT/MIGRATION FUNCTIONS ***
 
-
-def csv_to_postgres(engine,
-                      file: str,
-                      table_name: str):
-    """
-    Given a *.csv filepath, create a populated table in a database
-    :param engine: SQLAlchemy connection/engine for the target database
-    :param file: Full filepath of the *.csv file
-    :param table_name: Name of the table to be created
-    :return:
-    """
-    df = pd.read_csv(file,
-                     index_col=False)
-    # print(df.head())
-    # Postgres columns are case-sensitive; make lowercase
-    df.columns = df.columns.str.lower()
-    df.rename(columns={'unnamed: 0': 'id'},
-              inplace=True)
-
-    df.to_sql(con=engine,
-              name=table_name,
-              if_exists='replace',
-              index=False)
+# COMMENT OUT FOR DEPLOYMENT TO HEROKU
+# def csv_to_postgres(engine,
+#                       file: str,
+#                       table_name: str):
+#     """
+#     Given a *.csv filepath, create a populated table in a database
+#     :param engine: SQLAlchemy connection/engine for the target database
+#     :param file: Full filepath of the *.csv file
+#     :param table_name: Name of the table to be created
+#     :return:
+#     """
+#     df = pd.read_csv(file,
+#                      index_col=False)
+#     # print(df.head())
+#     # Postgres columns are case-sensitive; make lowercase
+#     df.columns = df.columns.str.lower()
+#     df.rename(columns={'unnamed: 0': 'id'},
+#               inplace=True)
+#
+#     df.to_sql(con=engine,
+#               name=table_name,
+#               if_exists='replace',
+#               index=False)
+#
+#     return None
 
 
 

@@ -9,11 +9,9 @@ def create_app():
     def hello_world():  # put application's code here
         return 'Hello World!'
 
-
-
-
     return app
 
 
 if __name__ == '__main__':
+    app = create_app()
     app.run()

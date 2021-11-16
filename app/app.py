@@ -15,7 +15,6 @@ def create_app():
     @app.route('/')
     def hello_world():  # put application's code here
         return 'Hello World!' + getenv('DATABASE_URL')
-    return app
 
 
     @app.route('/db')
@@ -27,6 +26,8 @@ def create_app():
         DB.drop_all()
         DB.create_all()
         return 'Database updated!'
+
+    return app
 
 
 if __name__ == '__main__':

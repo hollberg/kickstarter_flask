@@ -6,6 +6,11 @@ database schemas for Kickstarter app
 from os import getenv
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
+try:
+    from .ref import DATABASE_URL
+except ImportError:
+    raise ImportError('Did not find ref.py')
+
 
 
 
@@ -15,13 +20,13 @@ DB = SQLAlchemy()
 # Create SQLAlchemy engine object
 # Logic handles both local and Heroku environments
 try:
-    import ref
-    postgres_url = ref.DATABASE_URL
-except:
     postgres_url = getenv('DATABASE_URL')
     # Postgres URL uses the 'postgres' prefix rather than SQLAlchemy's
-    # preferred 'posgreql'. Fix this
+    # preferred 'posgresql'. Fix this
     postgres_url = postgres_url.replace('postgres', 'postgresql')
+except:
+    postgres_url = DATABASE_URL
+
 
 
 #postgres_url = r'postgresql://b'
@@ -94,7 +99,7 @@ if __name__ == '__main__':
                     file=r'data/Kickstarter_Merged_Data_With_Lat_Lng.csv',
                     table_name=table_name)
 
-# Query data from newly created/updated table
-results = engine.execute(f'SELECT * FROM {table_name} limit 5;')
-for record in results:
-    print(record)
+    # Query data from newly created/updated table
+    results = engine.execute(f'SELECT * FROM {table_name} limit 5;')
+    for record in results:
+        print(record)

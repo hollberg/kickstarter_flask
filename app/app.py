@@ -7,7 +7,7 @@ from .models import DB, Kickstarter, engine
 from os import getenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-# import pandas as pd
+import pandas as pd
 
 
 def create_app():
@@ -33,10 +33,10 @@ def create_app():
         ks = Kickstarter.query.all()
         ks_string = str(ks[0])
         DB.session.commit()
-        # df = pd.read_sql('select * from test limit 5;',
-        #                  con=engine)
+        df = pd.read_sql('select * from test limit 5;',
+                         con=engine)
         # DB.table('Kickstarter')
-        return 'Database updated!' + ks_string
+        return 'Database updated!' + ks_string + str(df.head())
 
     return app
 

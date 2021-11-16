@@ -3,11 +3,60 @@ models.py
 database schemas for Kickstarter app
 """
 # *** IMPORTS ***
+from os import getenv
 from flask_sqlalchemy import SQLAlchemy
+import pandas as pd
+
 
 
 # Create a DB Object
 DB = SQLAlchemy()
+
+# Create SQLAlchemy engine object
+# Logic handles both local and Heroku environments
+try:
+    import ref
+    postgres_url = ref.DATABASE_URL
+except:
+    postgres_url = getenv('DATABASE_URL')
+    # Postgres URL uses the 'postgres' prefix rather than SQLAlchemy's
+    # preferred 'posgreql'. Fix this
+    postgres_url = postgres_url.replace('postgres', 'postgresql')
+
+
+#postgres_url = r'postgresql://b'
+engine = DB.create_engine(sa_url=postgres_url,
+                          engine_opts={})
+
+moo = 'boo'
+
+
+# *** DATA IMPORT/MIGRATION FUNCTIONS ***
+
+
+def csv_to_postgres(engine,
+                      file: str,
+                      table_name: str):
+    """
+    Given a *.csv filepath, create a populated table in a database
+    :param engine: SQLAlchemy connection/engine for the target database
+    :param file: Full filepath of the *.csv file
+    :param table_name: Name of the table to be created
+    :return:
+    """
+    df = pd.read_csv(file,
+                     index_col=False)
+    # print(df.head())
+    # Postgres columns are case-sensitive; make lowercase
+    df.columns = df.columns.str.lower()
+    df.rename(columns={'unnamed: 0': 'id'},
+              inplace=True)
+
+    df.to_sql(con=engine,
+              name=table_name,
+              if_exists='replace',
+              index=False)
+
 
 
 # *** Define Models/Tables ***
@@ -36,3 +85,16 @@ class Kickstarter(DB.Model):
 
     def __repr__(self):
         return f'Kickstarter: name - {self.name}'
+
+
+# Run code to populate table
+if __name__ == '__main__':
+    table_name = 'test'
+    csv_to_postgres(engine=engine,
+                    file=r'data/Kickstarter_Merged_Data_With_Lat_Lng.csv',
+                    table_name=table_name)
+
+# Query data from newly created/updated table
+results = engine.execute(f'SELECT * FROM {table_name} limit 5;')
+for record in results:
+    print(record)

@@ -9,6 +9,7 @@ gunicorn = "*"
 flask-sqlalchemy = "*"
 psycopg2-binary = "*"
 pandas = "*"
+numpy = "*"
 
 [dev-packages]
 

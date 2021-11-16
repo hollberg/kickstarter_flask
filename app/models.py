@@ -6,6 +6,8 @@ database schemas for Kickstarter app
 from os import getenv
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
+
+# Comment out below when migrating to Heroku
 # try:
 #     from .ref import DATABASE_URL
 # except ImportError:
@@ -39,30 +41,30 @@ moo = 'boo'
 # *** DATA IMPORT/MIGRATION FUNCTIONS ***
 
 # COMMENT OUT FOR DEPLOYMENT TO HEROKU
-# def csv_to_postgres(engine,
-#                       file: str,
-#                       table_name: str):
-#     """
-#     Given a *.csv filepath, create a populated table in a database
-#     :param engine: SQLAlchemy connection/engine for the target database
-#     :param file: Full filepath of the *.csv file
-#     :param table_name: Name of the table to be created
-#     :return:
-#     """
-#     df = pd.read_csv(file,
-#                      index_col=False)
-#     # print(df.head())
-#     # Postgres columns are case-sensitive; make lowercase
-#     df.columns = df.columns.str.lower()
-#     df.rename(columns={'unnamed: 0': 'id'},
-#               inplace=True)
-#
-#     df.to_sql(con=engine,
-#               name=table_name,
-#               if_exists='replace',
-#               index=False)
-#
-#     return None
+def csv_to_postgres(engine,
+                      file: str,
+                      table_name: str):
+    """
+    Given a *.csv filepath, create a populated table in a database
+    :param engine: SQLAlchemy connection/engine for the target database
+    :param file: Full filepath of the *.csv file
+    :param table_name: Name of the table to be created
+    :return:
+    """
+    df = pd.read_csv(file,
+                     index_col=False)
+    # print(df.head())
+    # Postgres columns are case-sensitive; make lowercase
+    df.columns = df.columns.str.lower()
+    df.rename(columns={'unnamed: 0': 'id'},
+              inplace=True)
+
+    df.to_sql(con=engine,
+              name=table_name,
+              if_exists='replace',
+              index=False)
+
+    return None
 
 
 

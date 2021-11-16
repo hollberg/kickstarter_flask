@@ -5,7 +5,7 @@ database schemas for Kickstarter app
 # *** IMPORTS ***
 from os import getenv
 from flask_sqlalchemy import SQLAlchemy
-# import pandas as pd
+import pandas as pd
 # try:
 #     from .ref import DATABASE_URL
 # except ImportError:

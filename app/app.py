@@ -3,6 +3,7 @@ app.py - main app for the Kickstarter evaluator tool
 """
 
 # *** IMPORTS ***
+from .models import DB
 from os import getenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -23,8 +24,9 @@ def create_app():
 
         :return:
         """
-
-
+        DB.drop_all()
+        DB.create_all()
+        return 'Database updated!'
 
 
 if __name__ == '__main__':

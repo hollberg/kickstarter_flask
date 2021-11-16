@@ -20,7 +20,6 @@ def create_app():
     def hello_world():  # put application's code here
         return 'Hello World!'
 
-
     @app.route('/db')
     def load_db():
         """

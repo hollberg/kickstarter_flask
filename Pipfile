@@ -10,6 +10,8 @@ flask-sqlalchemy = "*"
 psycopg2-binary = "*"
 pandas = "*"
 numpy = "*"
+jupyter = "*"
+scikit-learn = "*"
 
 [dev-packages]
 

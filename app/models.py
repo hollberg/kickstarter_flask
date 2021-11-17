@@ -6,30 +6,29 @@ database schemas for Kickstarter app
 from os import getenv
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
+# from ref import DATABASE_URL
 
-# Comment out below when migrating to Heroku
-# try:
-#     from .ref import DATABASE_URL
-# except ImportError:
-#     raise ImportError('Did not find ref.py')
-
-
+# # Comment out below when migrating to Heroku
+try:
+    from ref import DATABASE_URL
+except ImportError:
+    pass    # Did not find ref.py
 
 
 # Create a DB Object
 DB = SQLAlchemy()
 
 # Create SQLAlchemy engine object
-postgres_url = getenv('DATABASE_URL')
-postgres_url = postgres_url.replace('postgres', 'postgresql')
+# postgres_url = getenv('DATABASE_URL')
+# postgres_url = postgres_url.replace('postgres', 'postgresql')
 # # Logic handles both local and Heroku environments
-# try:
-#     postgres_url = getenv('DATABASE_URL')
-#     # Postgres URL uses the 'postgres' prefix rather than SQLAlchemy's
-#     # preferred 'posgresql'. Fix this
-#     postgres_url = postgres_url.replace('postgres', 'postgresql')
-# except:
-#     postgres_url = DATABASE_URL
+try:
+    postgres_url = getenv('DATABASE_URL')
+    # Postgres URL uses the 'postgres' prefix rather than SQLAlchemy's
+    # preferred 'posgresql'. Fix this
+    postgres_url = postgres_url.replace('postgres', 'postgresql')
+except:
+    postgres_url = DATABASE_URL
 
 
 engine = DB.create_engine(sa_url=postgres_url,
@@ -98,12 +97,18 @@ class Kickstarter(DB.Model):
 
 # Run code to populate table
 if __name__ == '__main__':
-    table_name = 'test'
+    # table_name = 'LatLong'
+    # csv_to_postgres(engine=engine,
+    #                 file=r'data/Kickstarter_Merged_Data_With_Lat_Lng.csv',
+    #                 table_name=table_name)
+
+    # # Query data from newly created/updated table
+    # results = engine.execute(f'SELECT * FROM {table_name} limit 5;')
+    # for record in results:
+    #     print(record)
+
+    table_name = 'Model'
     csv_to_postgres(engine=engine,
-                    file=r'data/Kickstarter_Merged_Data_With_Lat_Lng.csv',
+                    file=r'data/Kickstarter_Data_For_Model.csv',
                     table_name=table_name)
 
-    # Query data from newly created/updated table
-    results = engine.execute(f'SELECT * FROM {table_name} limit 5;')
-    for record in results:
-        print(record)

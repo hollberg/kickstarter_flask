@@ -93,7 +93,6 @@ def csv_to_postgres(engine,
     return None
 
 
-
 # *** Define Models/Tables ***
 class Kickstarter(DB.Model):
     """
@@ -155,7 +154,7 @@ def build_preprocessor():
     return preprocessor
 
 
-def import_and_clean_data():
+def import_and_clean_data(submit_dict):
     """
 
     :return:
@@ -184,16 +183,21 @@ def import_and_clean_data():
              ]]
 
     # Add new record submitted by user
-    df = df.append({'name_and_blurb_text':
-                      'My Fun kickstarter! - Please give me money for stuff!',
-                  'goal': 30000.0,
-                  'campaign_duration': 60.0,
-                  'latitude': 39.9525,
-                  'longitude': -75.165,
-                  'category': 'fashion',
-                  'subcategory': 'jewelry'},
-                 ignore_index=True
-                 )
+    df = df.append(submit_dict,
+                   ignore_index=True
+                   )
+
+    """Stub value for submit_dict (from testing/development)
+        {'name_and_blurb_text':
+                  'Bound Printed Matter: The Life of JoeMisfit An Autobiography Follow & get to know music memorabilia collector JoeMisfit on his vivid & harrowing journey through life all the way up to present day.',
+                  'goal': 10000.0,
+                  'campaign_duration': 10.0,
+                  'latitude': 40.037875,
+                  'longitude': -76.305514,
+                  'category': 'publishing',
+                  'subcategory': 'nonfiction'},
+    """
+
 
     df = df.drop(columns=['outcome', 'days_to_success'])
 
@@ -207,7 +211,7 @@ def import_and_clean_data():
     return preprocessor.fit_transform(df)
 
 
-def process_record():
+def process_record(submit_dict):
     """
 
     :return:
@@ -218,7 +222,7 @@ def process_record():
         model_knn = pickle.load(file)
 
     # Populate mock data
-    X_transformed = import_and_clean_data()
+    X_transformed = import_and_clean_data(submit_dict)
 
     # Test on last record (recently appended)
     test_num = X_transformed.shape[0] - 1
@@ -226,18 +230,14 @@ def process_record():
     results = model_knn.kneighbors(X_transformed[test_num][:], n_neighbors=3,
                                    return_distance=False)
 
-    # print(results)
-
     prediction = model_knn.predict(X_transformed[test_num][:])
     # print(prediction)
 
     prob = model_knn.predict_proba(X_transformed[test_num][:])
-    # print('Probability: ', prob)
-    #
-    # print(df.loc[test_num])
-    # print(X_transformed[test_num][:])
-    # print('Shape of input: ', X_transformed[test_num][0].shape)
-    return str(prediction)
+
+    return str({'prediction': prediction,
+               'probability': prob,
+               'NearestNeighbors': results})
 
 
 

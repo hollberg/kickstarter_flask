@@ -3,7 +3,11 @@ app.py - main app for the Kickstarter evaluator tool
 """
 
 # *** IMPORTS ***
-from .models import DB, Kickstarter, engine
+from .models import DB, Kickstarter, engine, process_record
+# try:
+#     from .model_prep import process_record
+# except:
+#     from model_prep import process_record
 from os import getenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -36,7 +40,20 @@ def create_app():
         df = pd.read_sql('select * from test limit 5;',
                          con=engine)
         # DB.table('Kickstarter')
-        return 'Database updated!' + ks_string  + str(df.head())
+        return 'Database updated!' + ks_string + str(df.head())
+
+    @app.route('/predict')
+    def prediction():
+        """
+
+        :return:
+        """
+        return str(process_record())   # process_record())
+
+    
+
+
+
 
     return app
 

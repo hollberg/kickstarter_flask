@@ -211,7 +211,7 @@ def process_record():
     :return:
     """
     # Load model from pickle file
-    path = r'app/data/pickle_model.pkl'
+    path = r'app/data/pickle_model_10k.pkl'
     with open(path, 'rb') as file:
         model_knn = pickle.load(file)
 

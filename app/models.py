@@ -25,12 +25,12 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 # from ref import DATABASE_URL
 
 # # Comment out below when migrating to Heroku
-try:
-    from .ref import DATABASE_URL
-except ImportError:
-    from ref import DATABASE_URL
-else:
-    pass
+# try:
+#     from .ref import DATABASE_URL
+# except ImportError:
+#     from ref import DATABASE_URL
+# else:
+#     pass
 
 
 # Create a DB Object

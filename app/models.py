@@ -10,9 +10,11 @@ import pandas as pd
 
 # # Comment out below when migrating to Heroku
 try:
-    from ref import DATABASE_URL
+    from .ref import DATABASE_URL
 except ImportError:
-    pass    # Did not find ref.py
+    from ref import DATABASE_URL
+else:
+    pass
 
 
 # Create a DB Object
@@ -107,7 +109,7 @@ if __name__ == '__main__':
     # for record in results:
     #     print(record)
 
-    table_name = 'Model'
+    table_name = 'baby'
     csv_to_postgres(engine=engine,
                     file=r'data/Kickstarter_Data_For_Model.csv',
                     table_name=table_name)

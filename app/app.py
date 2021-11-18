@@ -36,7 +36,7 @@ def create_app():
         df = pd.read_sql('select * from test limit 5;',
                          con=engine)
         # DB.table('Kickstarter')
-        return 'Database updated!' + ks_string + str(df.head())
+        return 'Database updated!' + ks_string  + str(df.head())
 
     return app
 

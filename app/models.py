@@ -40,15 +40,15 @@ DB = SQLAlchemy()
 # postgres_url = getenv('DATABASE_URL')
 # postgres_url = postgres_url.replace('postgres', 'postgresql')
 # # Logic handles both local and Heroku environments
-if getenv('DATABASE_URL') is None:
-    try:
-        from .ref import DATABASE_URL
-        postgres_url = DATABASE_URL
-    except:
-        from ref import DATABASE_URL
-        postgres_url = DATABASE_URL
-else:
-    postgres_url = postgres_url.replace('postgres', 'postgresql')
+# if getenv('DATABASE_URL') is None:
+#     try:
+#         from .ref import DATABASE_URL
+#         postgres_url = DATABASE_URL
+#     except:
+#         from ref import DATABASE_URL
+#         postgres_url = DATABASE_URL
+# else:
+#     postgres_url = postgres_url.replace('postgres', 'postgresql')
 
 
 # try:
@@ -60,8 +60,9 @@ else:
 #     postgres_url = DATABASE_URL
 
 
-engine = DB.create_engine(sa_url=postgres_url,
-                          engine_opts={})
+# Uncomment below to reactivate DB query access
+# engine = DB.create_engine(sa_url=postgres_url,
+#                           engine_opts={})
 
 # *** DATA IMPORT/MIGRATION FUNCTIONS ***
 
@@ -160,7 +161,8 @@ def import_and_clean_data():
     :return:
     """
     # Import test data
-    df = pd.read_sql('SELECT * FROM public.model10k;', con=engine)
+    # df = pd.read_sql('SELECT * FROM public.model10k;', con=engine)
+    df = pd.read_csv('app/data/Kickstarter_Data_For_Model_10k.csv')
 
     # Combine text features into 1 column for model pipeline compatibility
     df['name_and_blurb_text'] = df['name'] + ' ' + df['blurb']

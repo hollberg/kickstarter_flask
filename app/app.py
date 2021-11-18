@@ -3,7 +3,8 @@ app.py - main app for the Kickstarter evaluator tool
 """
 
 # *** IMPORTS ***
-from .models import DB, Kickstarter, engine, process_record
+from .models import DB, Kickstarter, process_record
+# from .models import engine    # uncomment if using Heroku DB access
 # try:
 #     from .model_prep import process_record
 # except:
@@ -37,10 +38,10 @@ def create_app():
         ks = Kickstarter.query.all()
         ks_string = str(ks[0])
         DB.session.commit()
-        df = pd.read_sql('select * from test limit 5;',
-                         con=engine)
+        # df = pd.read_sql('select * from test limit 5;',
+        #                  con=engine)
         # DB.table('Kickstarter')
-        return 'Database updated!' + ks_string + str(df.head())
+        return 'Database updated!' + ks_string  # + str(df.head())
 
     @app.route('/predict')
     def prediction():
@@ -49,7 +50,6 @@ def create_app():
         :return:
         """
         return str(process_record())   # process_record())
-
 
 
     return app

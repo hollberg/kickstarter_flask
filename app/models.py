@@ -40,13 +40,24 @@ DB = SQLAlchemy()
 # postgres_url = getenv('DATABASE_URL')
 # postgres_url = postgres_url.replace('postgres', 'postgresql')
 # # Logic handles both local and Heroku environments
-try:
-    postgres_url = getenv('DATABASE_URL')
-    # Postgres URL uses the 'postgres' prefix rather than SQLAlchemy's
-    # preferred 'posgresql'. Fix this
+if getenv('DATABASE_URL') is None:
+    try:
+        from .ref import DATABASE_URL
+        postgres_url = DATABASE_URL
+    except:
+        from ref import DATABASE_URL
+        postgres_url = DATABASE_URL
+else:
     postgres_url = postgres_url.replace('postgres', 'postgresql')
-except:
-    postgres_url = DATABASE_URL
+
+
+# try:
+#     postgres_url = getenv('DATABASE_URL')
+#     # Postgres URL uses the 'postgres' prefix rather than SQLAlchemy's
+#     # preferred 'posgresql'. Fix this
+#     postgres_url = postgres_url.replace('postgres', 'postgresql')
+# except:
+#     postgres_url = DATABASE_URL
 
 
 engine = DB.create_engine(sa_url=postgres_url,
@@ -149,7 +160,7 @@ def import_and_clean_data():
     :return:
     """
     # Import test data
-    df = pd.read_sql('SELECT * FROM public."Model";', con=engine)
+    df = pd.read_sql('SELECT * FROM public.model10k;', con=engine)
 
     # Combine text features into 1 column for model pipeline compatibility
     df['name_and_blurb_text'] = df['name'] + ' ' + df['blurb']
@@ -182,7 +193,7 @@ def import_and_clean_data():
                  ignore_index=True
                  )
 
-    X = df.drop(columns=['outcome', 'days_to_success'])
+    df = df.drop(columns=['outcome', 'days_to_success'])
 
     preprocessor = build_preprocessor()
 
@@ -191,7 +202,7 @@ def import_and_clean_data():
     # with open(preprocessor_path, 'rb') as file:
     #     preprocessor = pickle.load(file)
 
-    return preprocessor.fit_transform(X), df
+    return preprocessor.fit_transform(df)
 
 
 def process_record():
@@ -205,7 +216,7 @@ def process_record():
         model_knn = pickle.load(file)
 
     # Populate mock data
-    X_transformed, df = import_and_clean_data()
+    X_transformed = import_and_clean_data()
 
     # Test on last record (recently appended)
     test_num = X_transformed.shape[0] - 1
@@ -240,8 +251,8 @@ if __name__ == '__main__':
     # for record in results:
     #     print(record)
 
-    table_name = 'baby'
+    table_name = 'model10k'
     csv_to_postgres(engine=engine,
-                    file=r'data/Kickstarter_Data_For_Model.csv',
+                    file=r'data/Kickstarter_Data_For_Model_10k.csv',
                     table_name=table_name)
 

@@ -64,7 +64,7 @@ def import_and_clean_data():
     :return:
     """
     # Import test data
-    df = pd.read_sql('SELECT * FROM public."Model";', con=engine)
+    df = pd.read_sql('SELECT * FROM public."Model" limit 20000;', con=engine)
 
     # Combine text features into 1 column for model pipeline compatibility
     df['name_and_blurb_text'] = df['name'] + ' ' + df['blurb']
@@ -97,7 +97,7 @@ def import_and_clean_data():
                  ignore_index=True
                  )
 
-    X = df.drop(columns=['outcome', 'days_to_success'])
+    df = df.drop(columns=['outcome', 'days_to_success'])
 
     preprocessor = build_preprocessor()
 
@@ -106,7 +106,7 @@ def import_and_clean_data():
     # with open(preprocessor_path, 'rb') as file:
     #     preprocessor = pickle.load(file)
 
-    return preprocessor.fit_transform(X), df
+    return preprocessor.fit_transform(df)
 
 
 def process_record():
@@ -120,7 +120,7 @@ def process_record():
         model_knn = pickle.load(file)
 
     # Populate mock data
-    X_transformed, df = import_and_clean_data()
+    X_transformed = import_and_clean_data()
 
     # Test on last record (recently appended)
     test_num = X_transformed.shape[0] - 1

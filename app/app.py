@@ -50,9 +50,6 @@ def create_app():
         """
         return str(process_record())   # process_record())
 
-    
-
-
 
 
     return app

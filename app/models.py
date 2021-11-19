@@ -357,8 +357,10 @@ def process_record(input_feature_list):
     prediction = model_knn.predict(user_data)
     # print(prediction)
 
+    neighbors = model_knn.kneighbors(user_data,n_neighbors=3, return_distance=False)
+
     prob = model_knn.predict_proba(user_data)
-    # print('Probability: ', prob)
+    print('Probability: ', prob)
     #
     # print(df.loc[test_num])
     # print(X_transformed[test_num][:])
@@ -368,9 +370,12 @@ def process_record(input_feature_list):
 
     # Convert 1 or 0 into text
     if pred == 1:
-        return "Successful"
+        prediction = "Successful"
     elif pred == 0:
-        return "Unsuccessful"
+        prediction = "Unsuccessful"
+
+    return {'pred': prediction,
+            'prob': prob[0][0]*100}
 
 # Run code to populate table
 if __name__ == '__main__':

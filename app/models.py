@@ -154,7 +154,7 @@ def build_preprocessor():
     return preprocessor
 
 
-def import_and_clean_data(submit_dict):
+def import_and_clean_data_old(submit_dict):
     """
 
     :return:
@@ -241,6 +241,137 @@ def process_record(submit_dict):
 
 
 
+def import_and_clean_data(input_feature_list):
+    """
+
+    :return:
+    """
+    # Break out input feature list into variables
+    name_and_blurb_text = input_feature_list[0]
+    funding_goal = input_feature_list[1]
+    campaign_duration = input_feature_list[2]
+    latitude = input_feature_list[3]
+    longitude = input_feature_list[4]
+    category = input_feature_list[5]
+    subcategory = input_feature_list[6]
+
+    # Import test data
+    path = r"app/data/Kickstarter_Data_For_Model_10k.csv"
+    df = pd.read_csv(path)
+
+    # Combine text features into 1 column for model pipeline compatibility
+    df["name_and_blurb_text"] = df["name"] + " " + df["blurb"]
+
+    # Drop original 2 text feature columns
+    df = df.drop(columns=["name", "blurb"], axis=1)
+
+    # Rearrange columns
+    # cols = list(df.columns.values)
+    df = df[
+        [
+            "name_and_blurb_text",
+            "goal",
+            "campaign_duration",
+            "latitude",
+            "longitude",
+            "category",
+            "subcategory",
+            "outcome",
+            "days_to_success",
+        ]
+    ]
+
+    # Add new record submitted by user
+    # df = df.append(
+    #     {
+    #         "name_and_blurb_text": name_and_blurb_text,
+    #         "goal": funding_goal,
+    #         "campaign_duration": campaign_duration,
+    #         "latitude": latitude,
+    #         "longitude": longitude,
+    #         "category": category,
+    #         "subcategory": subcategory,
+    #     },
+    #     ignore_index=True,
+    # )
+
+    df = df.drop(columns=["outcome", "days_to_success"])
+
+    preprocessor = build_preprocessor()
+
+    # # Load pickled preprocessor
+    # preprocessor_path = r'data/pickle_preprocessor.pkl'
+    # with open(preprocessor_path, 'rb') as file:
+    #     preprocessor = pickle.load(file)
+
+    preprocessor.fit_transform(df)
+
+    user_input_df = pd.DataFrame()
+    user_input_df = user_input_df.append(
+        {
+            "name_and_blurb_text": name_and_blurb_text,
+            "goal": funding_goal,
+            "campaign_duration": campaign_duration,
+            "latitude": latitude,
+            "longitude": longitude,
+            "category": category,
+            "subcategory": subcategory,
+        },
+        ignore_index=True,
+    )
+
+    user_input_df = user_input_df[
+        [
+            "name_and_blurb_text",
+            "goal",
+            "campaign_duration",
+            "latitude",
+            "longitude",
+            "category",
+            "subcategory",
+        ]
+    ]
+
+    return preprocessor.transform(user_input_df)
+
+def process_record(input_feature_list):
+    """
+
+    :return:
+    """
+    # Load model from pickle file
+    path = r"app/data/pickle_model_10k.pkl"
+    with open(path, "rb") as file:
+        model_knn = pickle.load(file)
+
+    # Populate mock data
+    user_data = import_and_clean_data(input_feature_list)
+
+    # Test on last record (recently appended)
+    # test_num = X_transformed.shape[0] - 1
+
+    results = model_knn.kneighbors(user_data, n_neighbors=3, return_distance=False)
+
+    # print(results)
+
+    prediction = model_knn.predict(user_data)
+    # print(prediction)
+
+    prob = model_knn.predict_proba(user_data)
+    # print('Probability: ', prob)
+    #
+    # print(df.loc[test_num])
+    # print(X_transformed[test_num][:])
+    # print('Shape of input: ', X_transformed[test_num][0].shape)
+    pred = str(prediction)
+    pred = int(pred[1])
+
+    # Convert 1 or 0 into text
+    if pred == 1:
+        return "Successful"
+    elif pred == 0:
+        return "Unsuccessful"
+
 # Run code to populate table
 if __name__ == '__main__':
     # table_name = 'LatLong'
@@ -255,6 +386,6 @@ if __name__ == '__main__':
 
     table_name = 'model10k'
     csv_to_postgres(engine=engine,
-                    file=r'data/Kickstarter_Data_For_Model_10k.csv',
+                    file=r'app/data/Kickstarter_Data_For_Model_10k.csv',
                     table_name=table_name)
 

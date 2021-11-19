@@ -23,7 +23,7 @@ def create_app():
 
     @app.route('/')
     def hello_world():  # put application's code here
-        return 'Hello World!'
+        return render_template('home.html')
 
     @app.route('/db')
     def load_db():
@@ -43,39 +43,108 @@ def create_app():
         # DB.table('Kickstarter')
         return 'Database updated!' + ks_string  # + str(df.head())
 
-    @app.route('/predict')
-    def prediction():
-        """
-
-        :return:
-        """
-        return str(process_record())   # process_record())
+    # @app.route('/predict')
+    # def prediction():
+    #     """
+    #
+    #     :return:
+    #     """
+    #     return str(process_record())   # process_record())
 
     @app.route('/base')
     def base():
         return render_template(r'base.html')
 
-    @app.route('/result', methods=['GET', 'POST'])
-    def result():
+    # @app.route('/result', methods=['GET', 'POST'])
+    # def result():
+    #
+    #     voo = 'boo'
+    #     submission = {
+    #         'name_and_blurb_text': request.form['title'] + request.form['subtitle'],
+    #          'goal': request.form['funding_goal'],
+    #          'campaign_duration': request.form['campaign_duration'],
+    #          'latitude': request.form['latitude'],
+    #          'longitude': request.form['longitude'],
+    #          'category': request.form['category'],
+    #          'subcategory': request.form['subcategory']
+    #     }
+    #
+    #     prediction = str(process_record(submission))
+    #     print(prediction)
+    #
+    #     return render_template('test.html',
+    #                            result={'submission': submission,
+    #                            'prediction': prediction})
 
-        voo = 'boo'
-        submission = {
-            'name_and_blurb_text': request.form['title'] + request.form['subtitle'],
-             'goal': request.form['funding_goal'],
-             'campaign_duration': request.form['campaign_duration'],
-             'latitude': request.form['latitude'],
-             'longitude': request.form['longitude'],
-             'category': request.form['category'],
-             'subcategory': request.form['subcategory']
-        }
+    @app.route("/result", methods=["GET", "POST"])
+    def prediction():
+        """
 
-        prediction = str(process_record(submission))
-        print(prediction)
+        :return:
+        """
+        if request.method == "POST":
+            title = request.form["title"]
+            subtitle = request.form["subtitle"]
+            category = request.form["category"]
+            subcategory = request.form["subcategory"]
+            city = request.form["city"]
+            state = request.form["state"]
+            country = request.form["country"]
+            campaign_duration = request.form["campaign_duration"]
+            funding_goal = request.form["funding_goal"]
 
-        return render_template('test.html',
-                               result={'submission': submission,
-                               'prediction': prediction})
+            location_text = city + ", " + state + ", " + country
+            name_and_blurb_text = title + " " + subtitle
+            campaign_duration = float(campaign_duration)
+            funding_goal = float(funding_goal)
 
+            import requests
+            import urllib.parse
+
+            def get_lat_value(location_text):
+                try:
+                    url = (
+                            "https://nominatim.openstreetmap.org/search/"
+                            + urllib.parse.quote(location_text)
+                            + "?format=json"
+                    )
+                    response = requests.get(url).json()
+                    lat = response[0]["lat"]
+                    lat = float(lat)
+                    return lat
+                except:
+                    return 0.0
+
+            def get_lng_value(location_text):
+                try:
+                    url = (
+                            "https://nominatim.openstreetmap.org/search/"
+                            + urllib.parse.quote(location_text)
+                            + "?format=json"
+                    )
+                    response = requests.get(url).json()
+                    lng = response[0]["lon"]
+                    lng = float(lng)
+                    return lng
+                except:
+                    return 0.0
+
+            # Convert user input location into lat/lng
+            latitude = get_lat_value(location_text=location_text)
+            longitude = get_lng_value(location_text=location_text)
+
+            input_features = [
+                name_and_blurb_text,
+                funding_goal,
+                campaign_duration,
+                latitude,
+                longitude,
+                category,
+                subcategory,
+            ]
+            prediction = process_record(input_feature_list=input_features)
+
+        return render_template("result.html", prediction=prediction)
 
     return app
 

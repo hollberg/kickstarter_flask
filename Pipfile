@@ -13,6 +13,7 @@ numpy = "*"
 jupyter = "*"
 scikit-learn = "*"
 category-encoders = "*"
+requests = "*"
 
 [dev-packages]
 
